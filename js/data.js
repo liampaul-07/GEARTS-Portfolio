@@ -96,7 +96,7 @@ window.PORTFOLIO = {
         { label: "What I'd do next", text: "Pursue more opportunities for street photography and expand my knowledge further." }
       ],
       facts: {
-        materials: "iPhone camera", time: "These shots were taken over the course of a few weeks", finished: "November 2026",
+        materials: "iPhone camera", time: "These shots were taken over the course of a few days", finished: "October 2026",
         inspiration: "I'm always inspired by attempting to capture the beauty of nature, the complexities of the world, and how emotion can be conveyed through a single frame. I also wanted to challenge myself to capture moments that are often overlooked in everyday life.",
         file: "[Original file names, e.g. IMG_0000.HEIC]"
       },
