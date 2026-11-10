@@ -1,0 +1,1 @@
+Becoming in progress is my final digital art portfolio for GEARTS (Art Appreciation). It’s built as an online exhibit: Part I collects the artworks I made in class, Part II follows my own artistic exploration, and the appendices hold the evidence behind each piece. Built with plain HTML, CSS and JavaScript.
