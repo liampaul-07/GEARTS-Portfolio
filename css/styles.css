@@ -1,0 +1,605 @@
+/* ==========================================================================
+   Becoming in Progress: an online exhibit
+   Fonts are self-hosted from /fonts so the site never depends on Google.
+   ========================================================================== */
+@font-face{font-family:"Bricolage Grotesque";src:url("../fonts/bricolage-grotesque.woff2") format("woff2");font-weight:200 800;font-stretch:75% 100%;font-display:swap}
+@font-face{font-family:"Instrument Sans";src:url("../fonts/instrument-sans.woff2") format("woff2");font-weight:400 700;font-stretch:75% 100%;font-display:swap}
+@font-face{font-family:"Instrument Serif";src:url("../fonts/instrument-serif.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Instrument Serif";src:url("../fonts/instrument-serif-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:swap}
+
+:root{
+  --ink:#0d1a18; --ink-2:#12221f; --cream:#f8ecd8; --apricot:#f6bb73; --amber:#e8893a; --ember:#c8532a;
+  --mute:#9fb0a9; --line:rgba(248,236,216,.16);
+  --pad:clamp(1.25rem,5vw,4.5rem);
+  --display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ink)}
+body{margin:0;background:transparent;color:var(--cream);font:400 1rem/1.6 var(--sans);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+
+/* ---------- The ground: the page sinks below the horizon ----------
+   Under the hills the green deepens toward a cool ink as you read down. The film grain sits over it,
+   so it stays textured, never a smooth gradient. In Part II a soft pool of colour follows the piece on screen. */
+@property --tint{syntax:"<color>";inherits:true;initial-value:#0d1a18}
+:root{--tint-0:#0d1a18;--tint-1:#1b3d2f;--tint-2:#10343a;--tint-3:#33281a}
+html{--tint:var(--tint-0);transition:--tint 1.4s ease}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;height:100lvh;
+  background:
+    linear-gradient(180deg,rgba(3,8,12,0) 0%,rgba(3,8,12,.55) 55%,#03080c 100%);
+}
+body::after,html::before{}
+html::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;height:100lvh;
+  background:radial-gradient(70% 55% at 38% 46%,color-mix(in srgb,var(--tint) 85%,transparent),transparent 72%);
+}
+@supports (animation-timeline:scroll()){
+  @media (prefers-reduced-motion:no-preference){
+    body::before{animation:ground linear both;animation-timeline:scroll(root);animation-range:85svh 100%}
+    @keyframes ground{from{opacity:.0}to{opacity:1}}
+  }
+}
+body::after{ /* film grain over everything */
+  content:"";position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.14;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+a{color:inherit}
+h1,h2,h3{text-wrap:balance}
+:focus-visible{outline:2px solid var(--apricot);outline-offset:3px}
+button{font:inherit}
+
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:var(--pad);top:-4rem;z-index:50;padding:.6rem 1rem;border-radius:99px;background:var(--cream);color:var(--ink);font-weight:600;text-decoration:none}
+.skip:focus{top:1rem}
+
+/* ---------- Sky: a dithered gradient ----------
+   The gradient is drawn normally, then an SVG filter (#dither, defined at the top of every page)
+   adds grain and snaps colours to 14 steps. Where a colour crosses a step the grain makes the
+   edge speckle instead of forming a clean band, like a risograph print.
+   Each room is a different time of day: data-dawn 1 is just before sunrise, 3 is full morning. */
+.sky{
+  position:absolute;inset:0;z-index:0;filter:url(#dither);
+  --sky-a:#1a3a34; --sky-b:#10241f; --sky-c:#0e1c19; --corner:#2a5249; --glow:rgba(232,137,58,.55); --glow-y:82%;
+  background:
+    radial-gradient(62% 46% at 50% var(--glow-y),var(--glow),transparent 70%),
+    radial-gradient(60% 50% at 8% 0%,var(--corner),transparent 70%),
+    linear-gradient(175deg,var(--sky-a),var(--sky-b) 62%,var(--sky-c));
+}
+[data-dawn="1"] .sky{--sky-a:#122822; --sky-b:#0d1c19; --sky-c:#0b1614; --corner:#1d3d36; --glow:rgba(232,137,58,.38); --glow-y:100%}
+[data-dawn="3"] .sky{--sky-a:#2d5b4f; --sky-b:#1a3d35; --sky-c:#12292a; --corner:#3a7266; --glow:rgba(246,187,115,.62); --glow-y:78%}
+
+/* ---------- Home hero ----------
+   Sizes are linked: headline (--F), hills (--hh), sun (--sun). --band is a solid strip
+   at the very bottom that holds the tagline and button; the landscape sits on top of it. */
+.hero{
+  --F:clamp(4rem,min(21vw,28svh),21rem);
+  --hh:clamp(160px,26svh,280px);
+  --band:clamp(7.5rem,15svh,9.5rem);
+  --ridge:.65;
+  --sun:calc(var(--F)*1.15);
+  --rise:calc(var(--hh)*var(--ridge) + var(--sun)/2);
+
+  position:relative;isolation:isolate;overflow:hidden;background:var(--ink-2);
+  display:flex;flex-direction:column;
+  min-height:100svh;padding:0 var(--pad) calc(var(--rise) + var(--band) + 1rem);
+}
+.hero::after{content:"";position:absolute;z-index:2;left:0;right:0;bottom:0;height:var(--band);background:var(--ink)}
+
+.scene{position:absolute;z-index:1;inset:auto 0 var(--band);height:var(--hh)}
+.hills{position:absolute;inset:0;display:block;width:100%;height:100%}
+
+.sun{
+  position:absolute;left:50%;translate:-50% 0;
+  bottom:calc(var(--hh)*var(--ridge) - var(--sun)/2);
+  width:var(--sun);aspect-ratio:1;border-radius:50%;
+  animation:rise 2.6s var(--ease) backwards;
+}
+.hero .sun{--d:var(--sun)}
+.phead .sun{--d:var(--s)}
+.glow{
+  position:absolute;inset:-85%;border-radius:50%;pointer-events:none;opacity:.78;
+  background:radial-gradient(circle,rgba(250,196,120,.6) 0%,rgba(232,137,58,.3) 30%,rgba(232,137,58,.09) 50%,transparent 68%);
+}
+.disc{
+  position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(180deg,#fcdca3 0%,#f1a554 46%,#c8532a 100%);
+  filter:url(#dither-sun);
+}
+.sun::before,.sun::after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(248,236,216,.22)}
+.sun::before{inset:-16%}
+.sun::after{inset:-32%;border-color:rgba(248,236,216,.12)}
+@keyframes rise{from{transform:translateY(55%)}}
+
+.top{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 0}
+.mark{font:600 1.05rem/1 var(--display);letter-spacing:-.005em;text-decoration:none}
+.pill{padding:.5rem 1rem;border:1px solid rgba(248,236,216,.32);border-radius:99px;font-size:.9rem;text-decoration:none;transition:background .2s,color .2s}
+.pill:hover{background:var(--cream);color:var(--ink)}
+button.pill{background:transparent;color:var(--cream);cursor:pointer}
+button.pill:hover{background:var(--cream);color:var(--ink)}
+
+.stage{position:relative;z-index:3;flex:1;display:flex;align-items:center;justify-content:center}
+.lockup{font-size:var(--F);text-align:center}
+h1{margin:0;font:680 1em/.9 var(--display);font-variation-settings:"wdth" 84;letter-spacing:-.012em}
+.word{display:block;animation:fill 2.4s var(--ease) backwards}
+@keyframes fill{
+  from{font-variation-settings:"wght" 200,"wdth" 100;opacity:0;transform:translateY(.1em)}
+  to{font-variation-settings:"wght" 680,"wdth" 84;opacity:1;transform:none}
+}
+.pro{
+  display:block;margin-top:calc(var(--F)*.02);color:var(--apricot);
+  font:italic 400 .36em/1 var(--serif);letter-spacing:0;
+  animation:fade 1.4s .9s ease backwards;
+}
+@keyframes fade{from{opacity:0;transform:translateY(.3em)}}
+
+.bottom{
+  position:absolute;z-index:4;left:var(--pad);right:var(--pad);bottom:clamp(1.25rem,2.5vw,2rem);
+  display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;
+}
+.sub{max-width:28ch;margin:0;font-size:clamp(1.05rem,1.6vw,1.3rem);line-height:1.4;color:rgba(248,236,216,.88)}
+.meta{display:flex;flex-direction:column;gap:.6rem}
+.btn{
+  display:inline-flex;align-items:center;gap:.7rem;padding:.95rem 1.5rem;border:0;border-radius:99px;
+  background:var(--cream);color:var(--ink);font-weight:600;text-decoration:none;cursor:pointer;
+  transition:transform .2s,background .2s;
+}
+.btn:hover{background:var(--apricot);transform:translateY(-2px)}
+.by{color:var(--mute)}
+
+/* ---------- Home: the rooms ---------- */
+.inside{padding:clamp(4rem,9vw,8rem) var(--pad)}
+.room-note{margin:0 0 2.2rem;color:var(--apricot);font:italic 400 clamp(1.3rem,2vw,1.7rem)/1.2 var(--serif)}
+.parts{margin:0;padding:0;list-style:none;border-bottom:1px solid var(--line)}
+.parts li{border-top:1px solid var(--line)}
+.parts a{
+  display:grid;grid-template-columns:3.2rem minmax(0,1.3fr) minmax(0,1fr);gap:1rem 2rem;align-items:center;
+  padding:1.7rem 0;text-decoration:none;transition:padding .3s var(--ease);
+}
+.parts a:hover,.parts a:focus-visible{padding-left:1rem}
+.parts a:hover h2,.parts a:focus-visible h2{color:var(--apricot)}
+.glyph{width:2.6rem;height:2.6rem;color:var(--mute);fill:var(--apricot)}
+.parts h2{margin:0;font:600 clamp(1.7rem,3.4vw,2.8rem)/1.02 var(--display);font-variation-settings:"wdth" 94,"opsz" 36;letter-spacing:.004em;transition:color .2s}
+.parts p{margin:0;color:var(--mute)}
+
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 2rem;padding:2rem var(--pad) 3rem;color:var(--mute);font-size:.9rem}
+
+/* ---------- Inner pages: header ----------
+   --lift is how far the sun has risen above the ridge, as a share of its own height:
+   .25 barely up, .5 half up, 1 clear. It climbs from room to room. */
+.phead{
+  --s:clamp(110px,15vw,210px);
+  --rh:clamp(110px,14vw,170px);
+  --ridge:.65;
+  --lift:.5;
+  --rise:calc(var(--rh)*var(--ridge) + var(--s)*var(--lift));
+
+  position:relative;isolation:isolate;overflow:hidden;background:var(--ink-2);
+  display:flex;flex-direction:column;
+  min-height:min(78svh,46rem);padding:0 var(--pad) calc(var(--rise) + 1.5rem);
+}
+.phead .scene{inset:auto 0 0;height:var(--rh)}
+.phead .sun{width:var(--s);bottom:calc(var(--rh)*var(--ridge) - var(--s)*(1 - var(--lift)))}
+.phead .top{flex-wrap:wrap;gap:.8rem 2rem}
+
+.site-nav{display:flex;flex-wrap:wrap;gap:.2rem 1.5rem;font-size:.92rem}
+.site-nav a{padding:.3rem 0;color:var(--mute);text-decoration:none;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.site-nav a:hover{color:var(--cream)}
+.site-nav a[aria-current="page"]{color:var(--cream);border-bottom-color:var(--apricot)}
+
+.ptitle{position:relative;z-index:3;flex:1;display:flex;flex-direction:column;justify-content:center;max-width:74rem;padding:2rem 0}
+.kick{margin:0 0 1rem;color:var(--apricot);font:italic 400 clamp(1.4rem,2.4vw,2rem)/1 var(--serif);animation:fade 1.4s .5s ease backwards}
+.ptitle h1{font-size:clamp(2.9rem,8.6vw,8rem);line-height:1;text-align:left;font-weight:640;font-variation-settings:"wdth" 92,"opsz" 40;letter-spacing:.008em}
+.ptitle .word{animation:fill-p 2.4s var(--ease) backwards}
+@keyframes fill-p{from{font-variation-settings:"wght" 200,"wdth" 100,"opsz" 40;opacity:0;transform:translateY(.1em)}to{font-variation-settings:"wght" 640,"wdth" 92,"opsz" 40;opacity:1;transform:none}}
+.lede{max-width:34rem;margin:1.4rem 0 0;font-size:clamp(1.05rem,1.5vw,1.25rem);line-height:1.5;color:rgba(248,236,216,.88);animation:fade 1.4s 1.1s ease backwards}
+
+.page{padding:clamp(3rem,7vw,6rem) var(--pad) clamp(4rem,8vw,7rem)}
+.page.flush{padding:0}
+
+/* ---------- Media slots ---------- */
+.media{
+  position:relative;display:block;aspect-ratio:var(--ar,16/9);overflow:hidden;border-radius:.35rem;
+  background:linear-gradient(160deg,#17332d,#112521);
+}
+.media img,.media video,.media iframe{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;border:0}
+.play{position:absolute;left:50%;top:50%;z-index:1;width:3.4rem;height:3.4rem;translate:-50% -50%;border-radius:50%;background:rgba(13,26,24,.72);border:1.5px solid var(--cream);pointer-events:none;transition:background .25s,scale .3s var(--ease)}
+.play::after{content:"";position:absolute;left:54%;top:50%;translate:-50% -50%;border-style:solid;border-width:.55rem 0 .55rem .9rem;border-color:transparent transparent transparent var(--cream)}
+.media:not(.has-media) .play{display:none}
+.open:hover .play,.open:focus-visible .play{background:var(--amber);scale:1.08}
+.ph{
+  position:absolute;inset:.6rem;display:grid;place-content:center;gap:.3rem;padding:1rem;text-align:center;
+  color:var(--mute);font-size:.85rem;line-height:1.4;border:1px dashed rgba(248,236,216,.24);border-radius:.25rem;
+}
+.ph strong{color:var(--cream);font-weight:600;font-size:.95rem}
+.media.has-media{background:#000}
+.media.has-media .ph{display:none}
+figure{margin:0}
+figcaption{margin-top:.6rem;color:var(--mute);font-size:.9rem}
+
+/* ---------- Part I: tabs and bento ---------- */
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem 2rem;margin-bottom:clamp(1.4rem,3vw,2.2rem)}
+.tabs{position:relative;display:inline-flex;max-width:100%;gap:.2rem;padding:.25rem;border:1px solid var(--line);border-radius:99px}
+.tab-thumb{position:absolute;top:.25rem;bottom:.25rem;left:0;z-index:0;width:var(--tw,0);border-radius:99px;background:var(--cream);transform:translateX(var(--tx,0))}
+.tabs.ready .tab-thumb{transition:transform .55s var(--ease),width .55s var(--ease)}
+.tab{position:relative;z-index:1;overflow:hidden;padding:.55rem 1.15rem;border:0;border-radius:99px;background:transparent;color:var(--cream);cursor:pointer;transition:color .3s,scale .15s}
+.tab:hover{background:rgba(248,236,216,.08)}
+.tab[aria-selected="true"],.tab[aria-selected="true"]:hover{color:var(--ink);background:transparent}
+.tab:disabled{opacity:.4;cursor:not-allowed}
+.tab:disabled:hover{background:transparent}
+.tab .count{margin-left:.4rem;opacity:.6;font-variant-numeric:tabular-nums}
+.status{margin:0;color:var(--mute);font-size:.92rem}
+
+/* Bento: twelve columns. js/main.js gives each visible work a slot, so the grid
+   always fills with no gaps, whichever tab is open. Four works make one block:
+   a (big), b (wide), c and d (small). Odd blocks mirror. A short last block uses solo, half or t1 to t3. */
+.works{
+  --row:clamp(10.5rem,17vw,15.5rem);
+  display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:var(--row);
+  gap:clamp(.6rem,1.2vw,1rem);
+}
+.work{position:relative;min-width:0;min-height:0}
+.work[data-slot="a"]{grid-column:1/7;grid-row:var(--r)/span 2}
+.work[data-slot="b"]{grid-column:7/13;grid-row:var(--r)}
+.work[data-slot="c"]{grid-column:7/10;grid-row:calc(var(--r) + 1)}
+.work[data-slot="d"]{grid-column:10/13;grid-row:calc(var(--r) + 1)}
+.work[data-slot="am"]{grid-column:7/13;grid-row:var(--r)/span 2}
+.work[data-slot="bm"]{grid-column:1/7;grid-row:var(--r)}
+.work[data-slot="cm"]{grid-column:1/4;grid-row:calc(var(--r) + 1)}
+.work[data-slot="dm"]{grid-column:4/7;grid-row:calc(var(--r) + 1)}
+.work[data-slot="solo"]{grid-column:1/13;grid-row:var(--r)/span 2}
+.work[data-slot="half0"]{grid-column:1/7;grid-row:var(--r)/span 2}
+.work[data-slot="half1"]{grid-column:7/13;grid-row:var(--r)/span 2}
+.work[data-slot="t0"]{grid-column:1/7;grid-row:var(--r)/span 2}
+.work[data-slot="t1"]{grid-column:7/13;grid-row:var(--r)}
+.work[data-slot="t2"]{grid-column:7/13;grid-row:calc(var(--r) + 1)}
+
+.open{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;border:0;background:none;color:inherit;text-align:left;cursor:zoom-in;border-radius:.35rem}
+.open .media{position:absolute;inset:0;height:100%;aspect-ratio:auto;transition:box-shadow .3s}
+.open .media img,.open .media video{transition:transform .8s var(--ease)}
+.open:hover .media img,.open:focus-visible .media img,.open:hover .media video{transform:scale(1.045)}
+.open:hover .media,.open:focus-visible .media{box-shadow:0 0 0 1px var(--apricot)}
+.open .media .ph{inset:.5rem}
+
+/* The plaque: a wall label for each work. A dark scrim and a layered shadow lift it off the picture. */
+.open::after{
+  content:"";position:absolute;inset:auto 0 0;height:64%;z-index:1;pointer-events:none;border-radius:0 0 .35rem .35rem;
+  background:linear-gradient(to top,rgba(5,12,10,.8),rgba(5,12,10,0));
+}
+.plaque{
+  position:absolute;left:.6rem;bottom:.6rem;z-index:2;display:grid;gap:.1rem;max-width:min(calc(100% - 1.2rem),17.5rem);
+  padding:.5rem .75rem .55rem;border-radius:.3rem;background:var(--cream);color:var(--ink);
+  box-shadow:0 1px 2px rgba(0,0,0,.45),0 .5rem 1rem rgba(0,0,0,.38),0 1.4rem 2.8rem rgba(0,0,0,.5);
+  transition:translate .4s var(--ease);
+}
+.open:hover .plaque,.open:focus-visible .plaque{translate:0 -.2rem}
+.plaque .l1{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.5rem}
+.plaque .l2{display:flex;flex-wrap:wrap;align-items:center;gap:0 .7rem}
+.plaque .pa{font:650 1rem/1.15 var(--display);font-variation-settings:"wdth" 94,"opsz" 30;letter-spacing:.004em}
+.plaque .pt{font:italic 400 .95rem/1.15 var(--serif);color:#2c3d38}
+.plaque .pm{font-size:.74rem;line-height:1.4;color:#4b5d57}
+.tag{display:inline-flex;align-items:center;gap:.35rem;font-size:.74rem;line-height:1.4;color:#4b5d57}
+.tag::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--amber)}
+.tag[data-t="group"]::before{background:transparent;border:1.5px solid var(--amber)}
+
+/* View transitions: tiles glide to their new places when you change tabs */
+::view-transition-group(*){animation-duration:.6s;animation-timing-function:var(--ease)}
+
+/* Viewer */
+.lightbox{
+  width:min(1180px,94vw);max-width:none;max-height:94svh;margin:auto;padding:0;border:0;overflow:visible;
+  background:transparent;color:var(--cream);
+}
+.lightbox::backdrop{background:rgba(6,13,11,.99)}
+.lightbox[open]{display:grid;gap:1rem;animation:pop .28s var(--ease)}
+@keyframes pop{from{opacity:0;transform:scale(.97)}}
+.lb-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.lb-bar .count{margin:0;color:var(--mute);font-size:.9rem;font-variant-numeric:tabular-nums}
+.lb-step{display:flex;gap:.6rem}
+.lb-stage{display:grid;place-items:center;min-height:0}
+.lb-stage img,.lb-stage video{display:block;max-width:100%;max-height:68svh;border-radius:.35rem}
+.lb-stage iframe{display:block;width:min(100%,calc(68svh*16/9));aspect-ratio:16/9;border:0;border-radius:.35rem;background:#000}
+.lb-cap{display:grid;gap:.3rem}
+.lb-cap h3{margin:0;font:650 clamp(1.6rem,2.8vw,2.3rem)/1.05 var(--display);font-variation-settings:"wdth" 94,"opsz" 36;letter-spacing:.004em}
+.lb-title{margin:0;color:var(--apricot);font:italic 400 1.3rem/1.2 var(--serif)}
+.lb-facts{display:flex;flex-wrap:wrap;gap:.3rem 2.2rem;margin:.6rem 0 .3rem}
+.lb-facts dt{color:var(--mute);font-size:.8rem}
+.lb-facts dd{margin:0;font-weight:500}
+.lb-note{margin:.2rem 0 0;max-width:62ch;color:rgba(248,236,216,.82)}
+.lb-stage.swap>*{animation:swap .5s var(--ease)}
+@keyframes swap{from{opacity:0;scale:.985}}
+
+/* ---------- Part II: the walk-through ----------
+   By default the pieces stack, one after another (phones, short screens, reduced motion).
+   On a big screen with motion allowed (see the @media block below) the stage pins to the
+   screen and each piece takes its turn as you scroll. */
+.scrolly{padding:clamp(2rem,5vw,4rem) var(--pad)}
+.pin{display:grid;gap:clamp(2.5rem,6vw,4rem)}
+.rail{display:none}
+.piece{display:grid;gap:1.4rem}
+.art .media{--ar:4/3}
+.piece .count{margin:0 0 .6rem;color:var(--mute);font-size:.9rem;font-variant-numeric:tabular-nums}
+.origin{margin:0 0 .8rem}
+.label .tag{margin:0;color:var(--mute)}
+.wtitle{margin:0;color:var(--apricot);font:italic 400 1.45rem/1.15 var(--serif)}
+.mline{margin:.35rem 0 1.3rem;color:var(--mute);font-size:.92rem}
+.label h2{margin:0 0 .3rem;font:650 clamp(2rem,3.6vw,3.1rem)/.98 var(--display);font-variation-settings:"wdth" 94,"opsz" 36;letter-spacing:.004em}
+.story{display:grid;gap:.9rem;margin:0}
+.story dt{font-weight:600;font-size:.9rem}
+.story dd{margin:.1rem 0 0;max-width:40ch;color:var(--mute);font-size:.95rem;line-height:1.5}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.4rem;margin-top:1.6rem}
+.btn-ev .n{display:inline-grid;place-items:center;min-width:1.6rem;height:1.6rem;padding:0 .4rem;border-radius:99px;background:var(--ink);color:var(--cream);font-size:.8rem}
+.textlink{
+  font-weight:600;text-decoration:underline;text-decoration-color:var(--apricot);text-decoration-thickness:1px;text-underline-offset:.35em;
+  transition:text-decoration-thickness .15s,color .2s;
+}
+.textlink:hover{color:var(--apricot);text-decoration-thickness:2px}
+
+@media (min-width:861px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
+  .scrolly{height:calc(100svh + var(--n)*85svh);padding:0}
+  .pin{
+    position:sticky;top:0;height:100svh;gap:0 clamp(1.5rem,3vw,3rem);
+    grid-template-columns:2.2rem minmax(0,1fr) minmax(19rem,26rem);grid-template-rows:minmax(0,1fr);
+    padding:clamp(1.2rem,3vw,2.4rem) var(--pad);align-items:stretch;
+  }
+  .piece{display:contents}
+  .rail{
+    grid-column:1;grid-row:1;align-self:center;display:grid;gap:.9rem;margin:0;padding:0;list-style:none;
+  }
+  .pip{
+    display:block;width:.9rem;height:.9rem;padding:0;border:1.5px solid var(--mute);border-radius:50%;background:transparent;cursor:pointer;
+    transition:background .3s,border-color .3s,transform .3s var(--ease);
+  }
+  .pip:hover{border-color:var(--cream)}
+  .pip[aria-current="true"]{background:var(--apricot);border-color:var(--apricot);transform:scale(1.25)}
+
+  .art,.label{grid-row:1;min-height:0}
+  .art{grid-column:2;position:relative;z-index:var(--z,1);
+    clip-path:circle(0% at 50% 100%);transition:clip-path 1.05s cubic-bezier(.7,0,.2,1)}
+  .art .media{--ar:auto;position:absolute;inset:0;height:100%;border-radius:.5rem}
+  .piece.is-active .art,.piece.is-past .art{clip-path:circle(150% at 50% 100%)}
+  .piece:first-of-type .art{clip-path:circle(150% at 50% 100%)}
+
+  .label{
+    grid-column:3;align-self:end;position:relative;z-index:var(--z,1);padding-bottom:.4rem;
+    opacity:0;visibility:hidden;transform:translateY(1.4rem);
+    transition:opacity .5s ease,transform .8s var(--ease),visibility 0s .5s;
+  }
+  .piece.is-active .label{opacity:1;visibility:visible;transform:none;transition:opacity .6s .45s ease,transform .9s .45s var(--ease),visibility 0s}
+  .piece.is-past .label{transform:translateY(-1.4rem)}
+}
+
+/* ---------- Evidence pop-up ---------- */
+.evidence{
+  width:min(980px,94vw);height:min(88svh,58rem);max-width:none;max-height:none;margin:auto;padding:0;overflow:hidden;
+  border:1px solid var(--line);border-radius:1rem;background:var(--ink-2);color:var(--cream);
+}
+.evidence::backdrop{background:rgba(6,13,11,.9)}
+.evidence[open]{display:grid;grid-template-rows:auto minmax(0,1fr);animation:pop .3s var(--ease)}
+.ev-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.2rem 1.4rem;border-bottom:1px solid var(--line)}
+.ev-sub{margin:0;color:var(--apricot);font:italic 400 1.2rem/1.1 var(--serif)}
+.ev-title{margin:.2rem 0 0;font:650 clamp(1.4rem,2.6vw,2rem)/1 var(--display);letter-spacing:-.02em}
+.ev-tools{display:flex;align-items:center;gap:1rem}
+.ev-count{margin:0;color:var(--mute);font-size:.9rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ev-scroll{overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-color:var(--line) transparent}
+.ev{
+  height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:.9rem;
+  padding:1.2rem 1.4rem 1.4rem;
+}
+.ev-media .media{--ar:auto;height:100%;border-radius:.5rem}
+.ev-media .media img,.ev-media .media video{object-fit:contain}
+.ev-media .media iframe{object-fit:contain}
+.ev-media{min-height:0}
+.ev figcaption{margin:0;max-width:60ch;color:var(--mute)}
+.ev figcaption strong{display:block;margin-bottom:.1rem;color:var(--cream);font:600 1.1rem/1.2 var(--display)}
+.ev-facts{grid-template-rows:auto;align-content:center;gap:1rem}
+.ev-facts h3{margin:0;font:650 clamp(1.8rem,3.4vw,2.6rem)/1 var(--display);font-variation-settings:"wdth" 94,"opsz" 36;letter-spacing:.004em}
+.ev-facts .intro{margin:0;max-width:44ch;color:var(--mute)}
+.facts{display:grid;gap:1rem;margin:.6rem 0 0}
+.facts dt{font-weight:600;font-size:.9rem}
+.facts dd{margin:.1rem 0 0;max-width:52ch;color:var(--mute)}
+.hint{margin:.6rem 0 0;color:var(--apricot);font:italic 400 1.2rem/1 var(--serif)}
+
+/* ---------- Looking forward: the essay ---------- */
+.essay{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:start;gap:3rem clamp(1.5rem,4vw,4rem)}
+.essay-side{grid-column:1/span 4;position:sticky;top:2rem}
+.essay-side .media{--ar:4/5}
+.prose{grid-column:6/span 7;max-width:36rem}
+.prose p{margin:0 0 1.4em;font:400 clamp(1.3rem,1.9vw,1.55rem)/1.5 var(--serif)}
+.prose blockquote{
+  margin:2.4rem 0;padding:0 0 0 1.4rem;border-left:2px solid var(--apricot);
+  color:var(--apricot);font:italic 400 clamp(1.8rem,3vw,2.5rem)/1.15 var(--serif);
+}
+.prose blockquote p{margin:0;font:inherit}
+.signoff{margin:2.6rem 0 0;color:var(--apricot);font:italic 400 1.6rem/1 var(--serif)}
+
+/* ---------- Appendices ---------- */
+.ledger{max-width:80rem}
+.ledger-intro{max-width:40rem;margin:0 0 2.6rem;color:var(--mute);font-size:1.1rem}
+.proof{border-top:1px solid var(--line)}
+.proof:last-child{border-bottom:1px solid var(--line)}
+.proof summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.3rem 1.5rem;padding:1.6rem 0;list-style:none;cursor:pointer}
+.proof summary::-webkit-details-marker{display:none}
+.pt2{font:650 clamp(1.6rem,3.4vw,2.8rem)/1 var(--display);font-variation-settings:"wdth" 94,"opsz" 36;letter-spacing:.004em;transition:color .2s}
+.pm2{grid-column:1;color:var(--mute)}
+.proof summary:hover .pt2,.proof summary:focus-visible .pt2{color:var(--apricot)}
+.chev{
+  grid-column:2;grid-row:1/span 2;position:relative;width:2.5rem;height:2.5rem;border-radius:50%;
+  border:1px solid rgba(248,236,216,.32);color:var(--cream);transition:transform .3s var(--ease),background .2s,color .2s;
+}
+.chev::before,.chev::after{content:"";position:absolute;left:50%;top:50%;background:currentColor;translate:-50% -50%}
+.chev::before{width:.9rem;height:1.5px}
+.chev::after{width:1.5px;height:.9rem}
+.proof[open] .chev{transform:rotate(45deg);background:var(--cream);color:var(--ink)}
+.proof-body{overflow:hidden}
+.proof-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:2rem clamp(1.5rem,3vw,3rem);padding:.5rem 0 3.2rem}
+.proof-grid .facts{grid-column:1/span 4;align-content:start;margin:0}
+.proof[open] .shots figure{animation:shot .8s var(--ease) backwards;animation-delay:calc(var(--i,0)*90ms + 220ms)}
+@keyframes shot{from{opacity:0;translate:0 1.2rem;scale:.97}}
+.proof summary:active .chev{scale:.88}
+.shots{grid-column:5/span 8;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.4rem 1rem}
+.shots .media{--ar:4/3}
+.shots .wide{grid-column:1/-1}
+.shots .wide .media{--ar:16/9}
+.shots figcaption strong{display:block;color:var(--cream);font-weight:600}
+
+/* ---------- Room to room ---------- */
+.pager{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.pager a{display:block;padding:2rem var(--pad) 2.4rem;text-decoration:none;transition:background .25s}
+.pager a+a{border-left:1px solid var(--line);text-align:right}
+.pager a:hover,.pager a:focus-visible{background:rgba(248,236,216,.05)}
+.pager small{display:block;margin-bottom:.4rem;color:var(--apricot);font:italic 400 1.2rem/1 var(--serif)}
+.pager span{font:600 clamp(1.4rem,3vw,2.4rem)/1.05 var(--display);font-variation-settings:"wdth" 94,"opsz" 36;letter-spacing:.004em;transition:color .2s}
+.pager a:hover span,.pager a:focus-visible span{color:var(--apricot)}
+
+/* ---------- Tablets and phones ---------- */
+@media (max-width:860px){
+  .hero{--sun:52vw;--band:0px}
+  .hero::after{display:none}
+  .bottom{position:relative;inset:auto;z-index:4;flex-direction:column;align-items:center;text-align:center;gap:1.2rem;margin-top:1rem}
+  .sub{max-width:34ch}
+  .meta{align-items:center}
+  .parts a{grid-template-columns:2.6rem 1fr}
+  .parts a p{grid-column:2}
+
+  .phead{min-height:min(70svh,36rem)}
+
+  .works{grid-auto-rows:auto;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .work[data-slot]{grid-column:auto;grid-row:auto;aspect-ratio:4/5}
+  .work[data-slot="a"],.work[data-slot="am"],.work[data-slot="solo"],.work[data-slot="t0"]{grid-column:1/-1;aspect-ratio:4/3}
+
+  .essay-side{grid-column:1/-1;position:static;max-width:22rem}
+  .prose{grid-column:1/-1}
+  .proof-grid .facts,.shots{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .tab{padding:.5rem .8rem}
+  .works{grid-template-columns:1fr}
+  .work[data-slot]{grid-column:1/-1;aspect-ratio:4/3}
+  .pager{grid-template-columns:1fr}
+  .pager a+a{border-left:0;border-top:1px solid var(--line);text-align:left}
+  .ev-head{flex-direction:column}
+  .evidence{height:92svh}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .sun,.word,.pro,.kick,.lede,.lightbox[open],.evidence[open],.proof[open] .shots figure{animation:none}
+  .parts a,.chev,.open .media img{transition:none}
+  ::view-transition-group(*){animation-duration:.01s}
+}
+
+/* ---------- Hero scroll motion ----------
+   As you leave a hero, the sun keeps climbing out from behind the hills and its rings spread
+   outward like ripples. The headline lifts away in layers, each at its own speed, so the
+   page has depth. Only runs where the browser supports scroll-driven animation. */
+@keyframes climb{to{translate:-50% calc(var(--d)*-.62)}}
+@keyframes bloom{to{scale:2.4;opacity:1}}
+@keyframes ring1{to{scale:1.28;opacity:0}}
+@keyframes ring2{to{scale:1.55;opacity:0}}
+@keyframes lift{to{translate:0 var(--dy,-2rem);opacity:0}}
+@supports (animation-timeline:scroll()){
+  @media (prefers-reduced-motion:no-preference){
+    .sun{animation:rise 2.6s var(--ease) backwards,climb linear both;animation-timeline:auto,scroll(root);animation-range:normal,0 95svh}
+    .glow{animation:bloom linear both;animation-timeline:scroll(root);animation-range:0 95svh}
+    .sun::before{animation:ring1 linear both;animation-timeline:scroll(root);animation-range:0 95svh}
+    .sun::after{animation:ring2 linear both;animation-timeline:scroll(root);animation-range:0 95svh}
+    .lay{animation:lift linear both;animation-timeline:scroll(root);animation-range:0 var(--rg,60svh)}
+    .lockup.lay{--rg:62svh;--dy:-7svh}
+    .lay.a{--rg:30svh;--dy:-1.2rem}
+    .lay.b{--rg:58svh;--dy:-3.4rem}
+    .lay.c{--rg:42svh;--dy:-2.2rem}
+  }
+}
+
+/* ---------- Click feedback ----------
+   A thin ring spreads from the click, echoing the rings round the sun. */
+.btn,.pill,.icon-btn{position:relative;overflow:hidden}
+.btn{transition:transform .2s,background .2s,scale .15s}
+.pill{transition:background .2s,color .2s,scale .15s}
+.btn:active,.pill:active,.tab:active{scale:.96}
+.pip:active{scale:.8}
+.ring{position:absolute;z-index:0;border:1.5px solid currentColor;border-radius:50%;pointer-events:none;translate:-50% -50%;scale:0;opacity:.5;animation:ringout .75s var(--ease) forwards}
+@keyframes ringout{to{scale:1;opacity:0}}
+
+/* Dialogs leave as softly as they arrive */
+.lightbox.closing,.evidence.closing{animation:popout .24s ease forwards}
+.lightbox.closing::backdrop,.evidence.closing::backdrop{animation:fadeout .24s ease forwards}
+@keyframes popout{to{opacity:0;transform:scale(.97) translateY(.6rem)}}
+@keyframes fadeout{to{opacity:0}}
+
+/* Each evidence slide settles in as it scrolls into view */
+@media (prefers-reduced-motion:no-preference){
+  .ev:not(.in) .ev-media,.ev:not(.in) figcaption{opacity:0;translate:0 1.2rem;scale:.985}
+  .ev .ev-media,.ev figcaption{transition:opacity .7s ease,translate .9s var(--ease),scale .9s var(--ease)}
+  .ev figcaption{transition-delay:.12s}
+}
+
+/* Part II: the artwork settles slowly while its piece is in view */
+@media (min-width:861px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
+  .piece.is-active .art .media img,.piece.is-active .art .media video{scale:calc(1.09 - .09*var(--lp,0))}
+}
+
+/* ---------- iPhone and iPad ----------
+   Safari draws SVG filters on page elements slowly and sometimes not at all, so the grainy sky
+   and sun fall back to the film grain that already covers the page. */
+@supports (-webkit-touch-callout:none){
+  .sky,.disc{filter:none}
+  .disc{background:linear-gradient(180deg,#fcdca3 0%,#f1a554 46%,#c8532a 100%)}
+}
+.top{padding-top:calc(1.4rem + env(safe-area-inset-top))}
+.foot{padding-bottom:calc(3rem + env(safe-area-inset-bottom))}
+body:has(dialog[open]){overflow:hidden}
+dialog{overscroll-behavior:contain}
+.ev-scroll,.lb-stage{-webkit-overflow-scrolling:touch}
+@media (hover:none){
+  .open:hover .media img,.open:hover .media video{transform:none}
+  .open:hover .plaque{translate:none}
+}
+
+/* ---------- Quiet icon buttons: just the symbol until you hover ---------- */
+.icon-btn{
+  display:inline-grid;place-items:center;flex:none;width:2.9rem;height:2.9rem;padding:0;
+  border:1.5px solid transparent;border-radius:50%;background:transparent;color:var(--cream);cursor:pointer;
+  transition:background .25s,border-color .25s,transform .35s var(--ease),color .25s;
+}
+.icon-btn svg{display:block;width:1.6rem;height:1.6rem}
+.icon-btn:hover,.icon-btn:focus-visible{background:rgba(248,236,216,.14);border-color:var(--cream);transform:translateY(-2px) scale(1.12)}
+.icon-btn:active{transform:scale(.94)}
+@media (hover:none){.icon-btn:hover{background:transparent;border-color:transparent;transform:none}}
+.lb-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem}
+.lb-foot .lb-cap{flex:1;min-width:0}
+.lb-nav{display:flex;gap:.3rem;flex:none;padding-bottom:.2rem}
+
+/* ---------- A piece with several pictures ---------- */
+.mosaic{display:grid;gap:.5rem;grid-template-columns:1fr 1fr;aspect-ratio:4/3}
+.mosaic .media{position:relative;inset:auto;min-height:0;height:100%;aspect-ratio:auto;border-radius:.4rem}
+.mosaic[data-n="3"]{grid-template-columns:1.5fr 1fr;grid-template-rows:1fr 1fr}
+.mosaic[data-n="3"] .media:first-child{grid-row:1/-1}
+.mosaic[data-n="4"]{grid-template-rows:1fr 1fr}
+@media (min-width:861px) and (min-height:640px) and (prefers-reduced-motion:no-preference){
+  .art .mosaic{position:absolute;inset:0;aspect-ratio:auto}
+}
+@media (max-width:560px){
+  .lb-foot{flex-direction:column-reverse;align-items:stretch}
+  .lb-nav{justify-content:flex-end}
+}
+.mosaic{background:var(--ink-2);border-radius:.4rem}
+
+/* Part II photos can be enlarged */
+.mosaic .media.has-media{cursor:zoom-in}
+.mosaic .media.has-media img{transition:filter .3s}
+.mosaic .media.has-media:hover img{filter:brightness(1.08)}
+.mosaic .media:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+/* Viewer fits the screen: the picture shrinks to the space left, and only a long description scrolls */
+.lightbox{height:94svh;max-height:94svh}
+.lightbox[open]{grid-template-rows:auto minmax(0,1fr) auto}
+.lb-stage{overflow:hidden;grid-template:minmax(0,1fr)/minmax(0,1fr)}
+.lb-stage img,.lb-stage video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.lb-stage iframe{height:100%;width:auto;max-width:100%;aspect-ratio:16/9}
+.lb-foot .lb-note{max-height:max(5.5rem,calc(34svh - 9rem));overflow-y:auto;overscroll-behavior:contain;padding-right:.6rem;scrollbar-width:thin;scrollbar-color:rgba(248,236,216,.3) transparent}
+@media (max-height:760px){.lb-cap h3{font-size:1.5rem}.lb-facts{margin:.3rem 0}}
+@media (max-width:560px){.lb-foot .lb-note{max-height:max(5.5rem,calc(30svh - 6rem))}}
