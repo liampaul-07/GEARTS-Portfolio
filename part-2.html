@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1a18">
+  <title>Part II — My Artistic Exploration — Becoming in Progress</title>
+  <meta name="description" content="Three pieces from my own exploration: one older artwork and two new works.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="dither" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="7" result="n"/>
+      <feColorMatrix in="n" type="matrix" values=".33 .33 .33 0 0  .33 .33 .33 0 0  .33 .33 .33 0 0  0 0 0 0 1" result="g"/>
+      <feComposite in="SourceGraphic" in2="g" operator="arithmetic" k1="0" k2="1" k3=".30" k4="-.15" result="d"/>
+      <feComponentTransfer in="d">
+        <feFuncR type="discrete" tableValues="0.000 0.077 0.154 0.231 0.308 0.385 0.462 0.538 0.615 0.692 0.769 0.846 0.923 1.000"/>
+        <feFuncG type="discrete" tableValues="0.000 0.077 0.154 0.231 0.308 0.385 0.462 0.538 0.615 0.692 0.769 0.846 0.923 1.000"/>
+        <feFuncB type="discrete" tableValues="0.000 0.077 0.154 0.231 0.308 0.385 0.462 0.538 0.615 0.692 0.769 0.846 0.923 1.000"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="dither-sun" x="-70%" y="-70%" width="240%" height="240%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="1" seed="3" result="n"/>
+      <feColorMatrix in="n" type="matrix" values=".33 .33 .33 0 0  .33 .33 .33 0 0  .33 .33 .33 0 0  0 0 0 0 1" result="g"/>
+      <feComposite in="SourceGraphic" in2="g" operator="arithmetic" k1="0" k2="1" k3=".42" k4="-.21" result="d"/>
+      <feComponentTransfer in="d">
+        <feFuncR type="discrete" tableValues="0.000 0.125 0.250 0.375 0.500 0.625 0.750 0.875 1.000"/>
+        <feFuncG type="discrete" tableValues="0.000 0.125 0.250 0.375 0.500 0.625 0.750 0.875 1.000"/>
+        <feFuncB type="discrete" tableValues="0.000 0.125 0.250 0.375 0.500 0.625 0.750 0.875 1.000"/>
+      </feComponentTransfer>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </svg>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="phead" data-dawn="2" style="--lift:.5">
+    <div class="sky" aria-hidden="true"></div>
+    <div class="scene" aria-hidden="true">
+      <span class="sun"><span class="glow"></span><span class="disc"></span></span>
+      <svg class="hills" viewBox="0 0 1440 300" preserveAspectRatio="none" focusable="false">
+        <defs>
+          <linearGradient id="rim" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#f6bb73" stop-opacity="0"/>
+            <stop offset=".5" stop-color="#f6bb73" stop-opacity=".85"/>
+            <stop offset="1" stop-color="#f6bb73" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path fill="#2b5149" d="M0,168 C200,150 360,122 540,118 C640,116 680,105 720,105 C760,105 800,116 900,118 C1080,122 1240,150 1440,166 L1440,300 L0,300 Z"/>
+        <path fill="none" stroke="url(#rim)" stroke-width="2" vector-effect="non-scaling-stroke" d="M0,168 C200,150 360,122 540,118 C640,116 680,105 720,105 C760,105 800,116 900,118 C1080,122 1240,150 1440,166"/>
+        <path fill="#1b3832" d="M0,148 C140,170 300,206 470,196 C600,188 680,180 720,180 C760,180 840,188 980,198 C1150,210 1300,164 1440,150 L1440,300 L0,300 Z"/>
+        <path fill="#0d1a18" d="M0,236 C220,222 430,240 650,244 C820,247 1010,230 1210,236 C1330,240 1400,230 1440,226 L1440,300 L0,300 Z"/>
+      </svg>
+    </div>
+
+    <div class="top">
+      <a class="mark" href="index.html">GEARTS — Art Appreciation</a>
+      <nav class="site-nav" aria-label="Portfolio">
+        <a href="part-1.html">Part I</a>
+        <a href="part-2.html" aria-current="page">Part II</a>
+        <a href="looking-forward.html">Looking forward</a>
+        <a href="appendices.html">Appendices</a>
+      </nav>
+    </div>
+
+    <div class="ptitle">
+      <div class="lay a"><p class="kick">Part II</p></div>
+      <div class="lay b"><h1><span class="word">My Artistic Exploration</span></h1></div>
+      <div class="lay c"><p class="lede">Three pieces from my own exploration: an older artwork and two new works. Scroll through each one, and open its evidence to see how it came to be.</p></div>
+    </div>
+  </header>
+
+  <main id="main" class="page flush">
+    <div id="exhibit"></div>
+  </main>
+
+    <dialog class="evidence" id="evidence" aria-labelledby="ev-title">
+      <div class="ev-head">
+        <div>
+          <p class="ev-sub">Evidence of originality</p>
+          <h2 class="ev-title" id="ev-title"></h2>
+        </div>
+        <div class="ev-tools">
+          <p class="ev-count" aria-live="polite"></p>
+          <button class="icon-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+      </div>
+      <div class="ev-scroll" tabindex="0" aria-label="Evidence, scroll to see each item"></div>
+    </dialog>
+
+  <nav class="pager" aria-label="Continue">
+    <a href="part-1.html"><small>Previous room</small><span>Part I — My Art Appreciation Journey</span></a>
+    <a href="looking-forward.html"><small>Next room</small><span>Looking forward — Who am I becoming?</span></a>
+  </nav>
+
+  <footer class="foot">
+    <span>Liam Paul Raboy</span>
+    <span>GEARTS — Art Appreciation, Final Digital Portfolio</span>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
